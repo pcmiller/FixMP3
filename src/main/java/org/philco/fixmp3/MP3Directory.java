@@ -1,5 +1,7 @@
 package org.philco.fixmp3;
 
+import org.philco.fixmp3.fixmp3.patterns.Antipattern;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
@@ -10,49 +12,58 @@ public class MP3Directory {
         return name;
     }
 
-    private File[] mp3Files;
-    public File[] getMp3Files() {
+    private MP3File[] mp3Files;
+    public MP3File[] getMp3Files() {
         return mp3Files;
     }
 
-    private File[] subdirectories;
-    public File[] getSubdirectories() {
-        return subdirectories;
+    private MP3Directory[] mp3Directories;
+    public MP3Directory[] getMp3Directories() {
+        return mp3Directories;
     }
 
-    private FilenameFilter directoryFilter;
-    private FilenameFilter mp3FileFilter;
+    private Antipattern[] antipatterns;
+
+    private FileFilter directoryFilter = new FileFilter() {
+        public boolean accept(File pathname) {
+            return pathname.isDirectory();
+        }
+    };
+
+    public MP3Directory(File directory) {
+        this(directory.getName());
+    }
 
     public MP3Directory(String directoryName) {
         this.name = directoryName;
         File directory = new File(directoryName);
 
         try {
-            subdirectories = directory.listFiles(new FileFilter() {
-                public boolean accept(File pathname) {
-                    return pathname.isDirectory();
-                }
-            });
+            File[] directories = directory.listFiles(directoryFilter);
+            if ( directories == null)
+                directories = new File[0];
 
-            mp3Files = directory.listFiles(new FileFilter() {
-                public boolean accept(File pathname) {
-                    return pathname.getName().endsWith(".mp3") && pathname.isFile();
-                }
-            });
+            mp3Directories = new MP3Directory[directories.length];
+            for (int i=0; i<directories.length; i++)
+                mp3Directories[i] = new MP3Directory(directories[i]);
+
+            mp3Files = MP3File.listFiles(this);
         } catch (SecurityException se) {
             System.err.println("Directory " + directoryName + " is inaccessible.");
-            subdirectories = new File[0];
-            mp3Files = new File[0];
+            mp3Directories = new MP3Directory[0];
+            mp3Files = new MP3File[0];
         }
     }
 
     public void workflow() {
-        for (File directory : subdirectories) {
-            System.out.println("Directory " + directory.getName());
+        System.out.println("Directory " + getName());
+        for (MP3Directory directory : mp3Directories) {
+            MP3Directory mp3Directory = new MP3Directory(directory.getName());
+            mp3Directory.workflow();
         }
 
-        for (File mp3File : mp3Files) {
-            System.out.println("MP3 file " + mp3File.getName());
+        for (MP3File mp3File : mp3Files) {
+            mp3File.workflow();
         }
     }
 }
