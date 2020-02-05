@@ -1,0 +1,24 @@
+## OPERATING SYSTEM
+*._*
+*.DS_Store*
+*thumbs.db*
+*desktop.ini*
+
+## BUILD
+**/target/**
+**/facade/**
+*.versionsBackup*
+*buildNumber.properties
+*git.properties
+
+## ECLIPSE
+*.classpath*
+*.project*
+*.settings*
+
+## INTELLIJ
+*.idea*
+*.iml*
+*.ipr*
+*.iws*
+
