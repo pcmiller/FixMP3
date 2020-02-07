@@ -4,7 +4,6 @@ import org.philco.fixmp3.fixmp3.patterns.Antipattern;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FilenameFilter;
 
 public class MP3Directory {
     private String name;
@@ -31,10 +30,10 @@ public class MP3Directory {
     };
 
     public MP3Directory(File directory) {
-        this(directory.getName());
+        this(directory.getAbsolutePath());
     }
 
-    public MP3Directory(String directoryName) {
+    private MP3Directory(String directoryName) {
         this.name = directoryName;
         File directory = new File(directoryName);
 
@@ -57,13 +56,11 @@ public class MP3Directory {
 
     public void workflow() {
         System.out.println("Directory " + getName());
-        for (MP3Directory directory : mp3Directories) {
-            MP3Directory mp3Directory = new MP3Directory(directory.getName());
-            mp3Directory.workflow();
-        }
 
-        for (MP3File mp3File : mp3Files) {
+        for (MP3Directory mp3Directory : mp3Directories)
+            mp3Directory.workflow();
+
+        for (MP3File mp3File : mp3Files)
             mp3File.workflow();
-        }
     }
 }

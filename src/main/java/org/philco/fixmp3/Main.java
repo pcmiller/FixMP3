@@ -11,7 +11,7 @@ public class Main {
             if ( ! (new File(arg).isDirectory() ))
                 System.err.println(arg + " is not a directory, skipped.");
             else {
-                mp3Directory = new MP3Directory(arg);
+                mp3Directory = new MP3Directory(new File(arg));
                 mp3Directory.workflow();
             }
         }

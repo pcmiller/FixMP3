@@ -7,6 +7,9 @@ import java.io.FileFilter;
 
 public class MP3File {
     private String name;
+    public String getName() {
+        return name;
+    }
 
     private Antipattern[] antipatterns;
 
@@ -34,10 +37,10 @@ public class MP3File {
     }
 
     public MP3File(File file) {
-        this(file.getName());
+        this(file.getAbsolutePath());
     }
 
-    public MP3File(String name) {
+    private MP3File(String name) {
         this.name = name;
     }
 }
