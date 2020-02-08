@@ -15,8 +15,8 @@ public class MP3Directory implements MP3Object {
     private File mp3Directory;
 
     // TODO: Fix tests in Maven
-    // TODO: Change pom to make shaded jar
     // TODO: Make log level changeable from command line
+    // TODO: Update .gitignore to include dependency-reduced-pom.xml
 
     @Override
     public boolean exists() {
