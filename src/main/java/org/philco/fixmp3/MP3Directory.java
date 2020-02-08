@@ -1,14 +1,18 @@
 package org.philco.fixmp3;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.philco.fixmp3.fixmp3.patterns.Antipattern;
 import org.philco.fixmp3.fixmp3.patterns.DirectoryWithSpacesRemoved;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.Arrays;
 
 public class MP3Directory implements MP3Object {
+    private static final Logger logger = LogManager.getLogger(MP3Directory.class.getName());
     private File mp3Directory;
+
+    // TODO: Fix tests in Maven
 
     @Override
     public boolean exists() {
@@ -60,7 +64,7 @@ public class MP3Directory implements MP3Object {
 
             mp3Files = listFiles(showMode);
         } catch (SecurityException se) {
-            System.err.println("*** Directory " + mp3Directory.getName() + " is inaccessible.");
+            logger.error("Directory {} is inaccessible.", mp3Directory.getName());
             mp3Directories = new MP3Directory[0];
             mp3Files = new MP3File[0];
         }
@@ -75,20 +79,20 @@ public class MP3Directory implements MP3Object {
     }
 
     public void workflow() {
-        System.out.println("--- Directory " + getName() + " ---");
+        logger.info("--- Directory {} ---", getName());
         for ( Antipattern antipattern : antipatterns ) {
             if ( antipattern.match(getName() )) {
-                System.out.println("   ...matched antipattern " + antipattern.getName());
+                logger.debug("matched antipattern {}", antipattern.getName());
                 String newName = antipattern.fix(getName());
                 if ( showMode )
-                    System.out.println("   ...Directory would change from " + getName() + " to " + newName);
+                    logger.info("Directory would change from {} to {}", getName(), newName);
                 else {
-                    System.out.println("   ...Directory name changed from " + getName() + " to> " + newName);
+                    logger.info("Directory name changed from {} to {}", getName(), newName);
                     mp3Directory = renameFile(mp3Directory, newName);
                     break;
                 }
             } else
-                System.out.println("   ...no match to antipattern " + antipattern.getName() + " for directory " + getName());
+                logger.trace("No match to antipattern {} for directory {}", antipattern.getName(), getName());
         }
 
         for (MP3Directory mp3Directory : mp3Directories)
@@ -116,13 +120,13 @@ public class MP3Directory implements MP3Object {
 
         try {
             if (! oldFile.renameTo(newFile)) {
-                System.out.println("*** Name change failed for " + oldFile.getName());
+                logger.error("Name change failed for {}", oldFile.getName());
                 return oldFile;
             } else
                 return newFile;
         } catch (Exception e) {
-            System.out.println(" failed with exception.");
-            System.err.println("Exception: " + e.getMessage());
+            logger.error("Name change for {} failed with exception.", oldFile.getName());
+            logger.error("Exception: {}", e.getMessage());
             return oldFile;
         }
     }
