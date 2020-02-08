@@ -22,4 +22,9 @@ public class FileWithDoubleIndexSeparatedBySpace implements Antipattern {
     public String fix(String filename) {
         return filename.replaceFirst(pattern, replacement);
     }
+
+    @Override
+    public String getName() {
+        return this.getClass().getSimpleName();
+    }
 }

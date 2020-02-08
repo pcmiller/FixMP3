@@ -56,6 +56,4 @@ public class AntipatternTest {
         String actual = new FileWithDiskDashDoubleIndexSeparatedBySpace().fix(input);
         assert expected.equals(actual);
     }
-
-
 }

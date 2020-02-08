@@ -1,46 +1,55 @@
 package org.philco.fixmp3;
 
 import org.philco.fixmp3.fixmp3.patterns.Antipattern;
+import org.philco.fixmp3.fixmp3.patterns.FileWithDiskDashDoubleIndexSeparatedBySpace;
+import org.philco.fixmp3.fixmp3.patterns.FileWithDoubleIndexSeparatedByHyphen;
+import org.philco.fixmp3.fixmp3.patterns.FileWithDoubleIndexSeparatedBySpace;
 
 import java.io.File;
 import java.io.FileFilter;
 
-public class MP3File {
-    private String name;
+public class MP3File implements MP3Object {
+    private boolean showMode;
+    private File mp3File;
     public String getName() {
-        return name;
+        return mp3File.getName();
     }
 
-    private Antipattern[] antipatterns;
+    @Override
+    public String toString() {
+        return getName();
+    }
 
-    private static FileFilter mp3FileFilter = new FileFilter() {
-        public boolean accept(File pathname) {
-            return pathname.getName().endsWith(".mp3") && pathname.isFile();
-        }
+    private Antipattern[] antipatterns = {
+        new FileWithDoubleIndexSeparatedBySpace(),
+        new FileWithDoubleIndexSeparatedByHyphen(),
+        new FileWithDiskDashDoubleIndexSeparatedBySpace(),
     };
 
-    public static MP3File[] listFiles(MP3Directory mp3Directory) {
-        File[] files = (new File(mp3Directory.getName()).listFiles(mp3FileFilter));
-        if ( files == null )
-            files = new File[0];
-
-        MP3File[] mp3Files = new MP3File[files.length];
-
-        for (int i=0; i<files.length; i++)
-            mp3Files[i] = new MP3File(files[i]);
-
-        return mp3Files;
-    }
-
     public void workflow() {
-        System.out.println("...workflow for " + name);
+        System.out.println("File " + getName());
+        for ( Antipattern antipattern : antipatterns ) {
+            if ( antipattern.match(getName() )) {
+                System.out.println("...matched antipattern " + antipattern.getName());
+                String newName = antipattern.fix(getName());
+                if ( showMode )
+                    System.out.println("...File would change from " + getName() + " -> " + newName);
+                else {
+                    mp3File = MP3Directory.renameFile(mp3File, newName);
+                    break;
+                }
+            } else
+                System.out.println("...no match to antipattern " + antipattern.getName() + " for file " + getName());
+        }
     }
 
-    public MP3File(File file) {
-        this(file.getAbsolutePath());
+    @Override
+    public boolean exists() {
+        return mp3File.exists();
     }
 
-    private MP3File(String name) {
-        this.name = name;
+    public MP3File(File mp3File, boolean showMode) {
+        this.mp3File = mp3File;
+        this.showMode = showMode;
     }
 }

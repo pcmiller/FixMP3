@@ -12,6 +12,11 @@ public class DirectoryWithSpacesRemoved implements Antipattern {
     }
 
     @Override
+    public String getName() {
+        return this.getClass().getSimpleName();
+    }
+
+    @Override
     public String fix(String filename) {
         return filename.replaceFirst(pattern, replacement);
     }
