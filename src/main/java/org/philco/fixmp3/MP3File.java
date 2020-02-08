@@ -30,7 +30,6 @@ public class MP3File implements MP3Object {
     };
 
     public void workflow() {
-        logger.info("File {}", getName());
         for ( Antipattern antipattern : antipatterns ) {
             if ( antipattern.match(getName() )) {
                 logger.debug("Matched antipattern {}", antipattern.getName());
@@ -39,6 +38,7 @@ public class MP3File implements MP3Object {
                 if ( showMode )
                     logger.info("File would change from {} to {}", getName(), newName);
                 else {
+                    logger.info("File changed from {} to {}", getName(), newName);
                     mp3File = MP3Directory.renameFile(mp3File, newName);
                     break;
                 }

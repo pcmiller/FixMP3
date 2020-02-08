@@ -7,12 +7,16 @@ import org.philco.fixmp3.fixmp3.patterns.DirectoryWithSpacesRemoved;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class MP3Directory implements MP3Object {
     private static final Logger logger = LogManager.getLogger(MP3Directory.class.getName());
     private File mp3Directory;
 
     // TODO: Fix tests in Maven
+    // TODO: Change pom to make shaded jar
+    // TODO: Make log level changeable from command line
 
     @Override
     public boolean exists() {
@@ -79,7 +83,7 @@ public class MP3Directory implements MP3Object {
     }
 
     public void workflow() {
-        logger.info("--- Directory {} ---", getName());
+        logger.info("Directory {}", getName());
         for ( Antipattern antipattern : antipatterns ) {
             if ( antipattern.match(getName() )) {
                 logger.debug("matched antipattern {}", antipattern.getName());
@@ -116,14 +120,10 @@ public class MP3Directory implements MP3Object {
     }
 
     static File renameFile(File oldFile, String newName) {
-        File newFile = new File(newName);
+        Path oldPath = oldFile.toPath();
 
         try {
-            if (! oldFile.renameTo(newFile)) {
-                logger.error("Name change failed for {}", oldFile.getName());
-                return oldFile;
-            } else
-                return newFile;
+            return Files.move(oldPath, oldPath.resolveSibling(newName)).toFile();
         } catch (Exception e) {
             logger.error("Name change for {} failed with exception.", oldFile.getName());
             logger.error("Exception: {}", e.getMessage());
