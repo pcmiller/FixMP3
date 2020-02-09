@@ -10,6 +10,7 @@
 *.versionsBackup*
 *buildNumber.properties
 *git.properties
+**/dependency-reduced-pom.xml
 
 ## ECLIPSE
 *.classpath*

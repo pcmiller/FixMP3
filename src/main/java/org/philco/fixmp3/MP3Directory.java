@@ -15,8 +15,6 @@ public class MP3Directory implements MP3Object {
     private File mp3Directory;
 
     // TODO: Fix tests in Maven
-    // TODO: Make log level changeable from command line
-    // TODO: Update .gitignore to include dependency-reduced-pom.xml
 
     @Override
     public boolean exists() {
@@ -56,7 +54,10 @@ public class MP3Directory implements MP3Object {
     private MP3Directory(File directory, boolean showMode) {
         this.showMode = showMode;
         this.mp3Directory = directory;
+        scan();
+    }
 
+    private void scan() {
         try {
             File[] directories = mp3Directory.listFiles(directoryFilter);
             if ( directories == null)
@@ -73,11 +74,7 @@ public class MP3Directory implements MP3Object {
             mp3Files = new MP3File[0];
         }
     }
-
-    public MP3Directory(String directoryName) {
-        this(new File(directoryName), false);
-    }
-
+    
     public MP3Directory(String directoryName, boolean showMode) {
         this(new File(directoryName), showMode);
     }
@@ -93,6 +90,7 @@ public class MP3Directory implements MP3Object {
                 else {
                     logger.info("Directory name changed from {} to {}", getName(), newName);
                     mp3Directory = renameFile(mp3Directory, newName);
+                    scan();
                     break;
                 }
             } else
@@ -123,10 +121,13 @@ public class MP3Directory implements MP3Object {
         Path oldPath = oldFile.toPath();
 
         try {
-            return Files.move(oldPath, oldPath.resolveSibling(newName)).toFile();
+            File newFile = Files.move(oldPath, oldPath.resolveSibling(newName)).toFile();
+            String type = (oldFile.isDirectory()) ? "Directory" : "File";
+            logger.info("{} changed from {} to {}", type, oldFile.getName(), newName);
+            return newFile;
         } catch (Exception e) {
             logger.error("Name change for {} failed with exception.", oldFile.getName());
-            logger.error("Exception: {}", e.getMessage());
+            logger.error("Exception: {} {}", e.getClass().getName(), e.getCause());
             return oldFile;
         }
     }

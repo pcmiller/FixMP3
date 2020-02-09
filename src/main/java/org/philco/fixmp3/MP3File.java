@@ -38,8 +38,14 @@ public class MP3File implements MP3Object {
                 if ( showMode )
                     logger.info("File would change from {} to {}", getName(), newName);
                 else {
-                    logger.info("File changed from {} to {}", getName(), newName);
-                    mp3File = MP3Directory.renameFile(mp3File, newName);
+                    File newNameFile = new File(mp3File.getParent(), newName);
+                    if ( newNameFile.exists())
+                        if ( mp3File.delete() )
+                            logger.info("Removed duplicate file {}", mp3File.getName());
+                        else
+                            logger.error("Failed to remove duplicate {}", mp3File.getName());
+                    else
+                        mp3File = MP3Directory.renameFile(mp3File, newName);
                     break;
                 }
             } else
